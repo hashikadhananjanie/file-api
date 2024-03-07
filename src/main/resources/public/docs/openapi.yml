@@ -1,0 +1,115 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: File API
+
+paths:
+  /status:
+    get:
+      summary: Status
+      description: Get Status.
+      responses:
+        '200':
+          description: It's a response.
+  /files:
+    post:
+      summary: Upload a file
+      description: Save a file and return an unique token for the uploaded file.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the file
+                contentType:
+                  type: string
+                  description: Content type of the file
+                meta:
+                  type: string
+                  description: Metadata of the file (JSON string)
+                source:
+                  type: string
+                  description: Source of the file
+                expireTime:
+                  type: string
+                  description: Expiry time of the file (optional)
+                content:
+                  type: string
+                  format: binary
+                  description: The file content
+      responses:
+        '201':
+          description: A token will be returned as the response.
+        '400':
+          description: Error messages will be returned for invalid user requests.
+        '503':
+          description: Response for internal exceptions.
+  /files/metas:
+    post:
+      summary: Request metadata of files
+      description: Return a list of file metadata for given tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MetaDataRequest'
+      responses:
+        '200':
+          description: List of metadata will be returned as the response.
+        '400':
+          description: Error messages will be returned for invalid user requests.
+        '503':
+          description: Response for internal exceptions.
+  /file/{token}:
+    get:
+      summary: Request a file
+      description: Return the file with valid headers set
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema:
+            type: string
+          description: Token of the file
+      responses:
+        '200':
+          description: List of metadata will be returned as the response.
+        '400':
+          description: Error messages will be returned for invalid user requests.
+        '503':
+          description: Response for internal exceptions.
+    delete:
+      summary: Delete a file
+      description: Delete a file by token
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema:
+            type: string
+          description: Token of the file to delete
+      responses:
+        '200':
+          description: List of metadata will be returned as the response.
+        '400':
+          description: Error messages will be returned for invalid user requests.
+        '503':
+          description: Response for internal exceptions.
+
+components:
+  schemas:
+    MetaDataRequest:
+      type: object
+      properties:
+        tokens:
+          type: array
+          items:
+            type: string
+
+security:
+  - basicAuth: []
